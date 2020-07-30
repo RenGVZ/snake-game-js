@@ -1,3 +1,4 @@
+const GAME_SPEED = 100;
 const CANVAS_BACKGROUND = 'white';
 const CANVAS_BORDER = 'green';
 const SNAKE_COLOR = 'lightgreen';
@@ -10,9 +11,19 @@ let snake = [
   {x: 130, y: 150},
   {x: 120, y: 150},
   {x: 110, y: 150},
+  {x: 100, y: 150},
+  {x: 90, y: 150},
+  {x: 80, y: 150},
+  {x: 70, y: 150},
+  {x: 60, y: 150},
 ]
+// User score
 let score = 0;
 // horizontal velocity
+let foodX;
+
+let foodY;
+
 let dx = 10;
 // vertical velocity
 let dy = 0;
@@ -30,26 +41,14 @@ ctx.fillRect(0, 0, canvas.width, canvas.height);
 // draw a bvorder around the entire canvas
 ctx.strokeRect(0, 0, canvas.width, canvas.height);
 
-/**
-       * Advances the snake by changing the x-coordinates of its parts
-       * according to the horizontal velocity and the y-coordinates of its parts
-       * according to the vertical veolocity
-*/
-// move to the right
-// advanceSnake();
-// change vertical velocity to 0
-// dx = 0;
-// change horizontal velocity to 10
-// dy = -10;
-// move 1 step up
-// advanceSnake();
-// draw snake on the canvas
-// drawSnake();
 createFood();
 main();
 
 function main() {
-  // if (didEndGame()) return;
+  if (didEndGame()) {
+    document.querySelector('h1').innerText = "You lost";
+    return
+  }
   setTimeout(function onTick() {
     clearCanvas();
     drawFood();
@@ -57,45 +56,48 @@ function main() {
     drawSnake();
     // call 'main' function over and over again
     main();
-  }, 100);
+  }, GAME_SPEED);
 }
 
 document.addEventListener('keydown', changeDirection)
 
+/**
+       * Advances the snake by changing the x-coordinates of its parts
+       * according to the horizontal velocity and the y-coordinates of its parts
+       * according to the vertical veolocity
+*/
 function advanceSnake() {
   const head = { 
     x: snake[0].x + dx, 
     y: snake[0].y + dy 
   };
   snake.unshift(head)
-  const didCollide = snake.forEach(part => {
-    snake[0] === snake[part]
-    });
-  if (didCollide) {
-    alert('failed');
-  }
   const didEatFood = snake[0].x === foodX && snake[0].y === foodY;
   if (didEatFood) {
+    // increase score
     score += 10;
+    // display score
     document.getElementById('score').innerText = score;
+    // generate new food location
     createFood();
   } else { 
+    // remove last part of the snake's body
     snake.pop();
   };
 }
 // returns true if the conditions to end the game were met, false if otherwise
 function didEndGame() {
   for (let i = 4; i < snake.length; i++) {
-    const didCollide = snake[i].x === snake[0].x 
-      && snake[i].y === snake[0].y
-    if (didCollide) return true }
-    const hitLeftWall = snake[0].x < 0;
-    const hitRightWall = snake[0].x < canvas.width - 10;
-    const hitTopWall = snake[0].y < 0;
-    const hitBottomWall = snake[0].y > canvas.height - 10;
-    return hitLeftWall || hitRightWall || hitTopWall || hitBottomWall
+    if (snake[i].x === snake[0].x && snake[i].y === snake[0].y) {
+      return true
+    }
   }
-
+  const hitLeftWall = snake[0].x < 0;
+  const hitRightWall = snake[0].x > canvas.width - 10;
+  const hitTopWall = snake[0].y < 0;
+  const hitBottomWall = snake[0].y > canvas.height - 10;
+  return hitLeftWall || hitRightWall || hitTopWall || hitBottomWall
+}
 // display the snake on the canvas, this is a function to draw a rectangle for each pair of coordinates
 function drawSnakePart(snakePart) {
   ctx.fillStyle = SNAKE_COLOR;
@@ -107,9 +109,9 @@ function drawSnakePart(snakePart) {
 function changeDirection(event) {
   const LEFT_KEY = 37; const RIGHT_KEY  = 39;
   const UP_KEY = 38; const DOWN_KEY = 40;
-  const keyPressed = event.keyCode; const goingUp = dy === -10;
-  const goingDown = dy === 10; const goingRight = dx === 10;
-  const goingLeft = dx === -10;
+  const keyPressed = event.keyCode; 
+  const goingUp = dy === -10; const goingDown = dy === 10; 
+  const goingRight = dx === 10; const goingLeft = dx === -10;
   if (keyPressed === LEFT_KEY && !goingRight) {
     dx = -10;
     dy = 0;
@@ -155,7 +157,7 @@ function createFood() {
     }
   });
 }
-
+// draw food on the canvas
 function drawFood() {
   ctx.fillStyle = 'red';
   ctx.strokeStyle = 'darkred';
