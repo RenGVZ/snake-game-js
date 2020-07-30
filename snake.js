@@ -11,6 +11,7 @@ let snake = [
   {x: 120, y: 150},
   {x: 110, y: 150},
 ]
+let score = 0;
 // horizontal velocity
 let dx = 10;
 // vertical velocity
@@ -44,12 +45,14 @@ ctx.strokeRect(0, 0, canvas.width, canvas.height);
 // advanceSnake();
 // draw snake on the canvas
 // drawSnake();
-
+createFood();
 main();
 
 function main() {
+  // if (didEndGame()) return;
   setTimeout(function onTick() {
     clearCanvas();
+    drawFood();
     advanceSnake();
     drawSnake();
     // call 'main' function over and over again
@@ -65,8 +68,33 @@ function advanceSnake() {
     y: snake[0].y + dy 
   };
   snake.unshift(head)
-  snake.pop()
+  const didCollide = snake.forEach(part => {
+    snake[0] === snake[part]
+    });
+  if (didCollide) {
+    alert('failed');
+  }
+  const didEatFood = snake[0].x === foodX && snake[0].y === foodY;
+  if (didEatFood) {
+    score += 10;
+    document.getElementById('score').innerText = score;
+    createFood();
+  } else { 
+    snake.pop();
+  };
 }
+// returns true if the conditions to end the game were met, false if otherwise
+function didEndGame() {
+  for (let i = 4; i < snake.length; i++) {
+    const didCollide = snake[i].x === snake[0].x 
+      && snake[i].y === snake[0].y
+    if (didCollide) return true }
+    const hitLeftWall = snake[0].x < 0;
+    const hitRightWall = snake[0].x < canvas.width - 10;
+    const hitTopWall = snake[0].y < 0;
+    const hitBottomWall = snake[0].y > canvas.height - 10;
+    return hitLeftWall || hitRightWall || hitTopWall || hitBottomWall
+  }
 
 // display the snake on the canvas, this is a function to draw a rectangle for each pair of coordinates
 function drawSnakePart(snakePart) {
@@ -104,6 +132,11 @@ function drawSnake() {
   snake.forEach(drawSnakePart);
 }
 
+// generate a random food placement function
+function randomTen(min, max) {
+  return Math.round((Math.random() * (max-min) + 10) / 10) * 10;
+}
+
 // clear canvas function
 function clearCanvas() {
   ctx.fillStyle = CANVAS_BACKGROUND;
@@ -111,3 +144,21 @@ function clearCanvas() {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.strokeRect(0, 0, canvas.width, canvas.height);
 }
+
+function createFood() {
+  foodX = randomTen(0, canvas.width - 10);
+  foodY = randomTen(0, canvas.height - 10);
+  snake.forEach(function isFoodOnSnake(part) {
+    const foodIsOnSnake = part.x == foodX && part.y == foodY;
+    if (foodIsOnSnake) {
+      createFood();
+    }
+  });
+}
+
+function drawFood() {
+  ctx.fillStyle = 'red';
+  ctx.strokeStyle = 'darkred';
+  ctx.fillRect(foodX, foodY, 10, 10);
+  ctx.strokeRect(foodX, foodY, 10, 10);
+};
