@@ -29,21 +29,35 @@ ctx.fillRect(0, 0, canvas.width, canvas.height);
 // draw a bvorder around the entire canvas
 ctx.strokeRect(0, 0, canvas.width, canvas.height);
 
-// move to the right
-advanceSnake();
-// change vertical velocity to 0
-dx = 0;
-// change horizontal velocity to 10
-dy = 10;
-// move 1 step up
-advanceSnake();
-// draw snake on the canvas
-drawSnake();
 /**
        * Advances the snake by changing the x-coordinates of its parts
        * according to the horizontal velocity and the y-coordinates of its parts
        * according to the vertical veolocity
 */
+// move to the right
+// advanceSnake();
+// change vertical velocity to 0
+// dx = 0;
+// change horizontal velocity to 10
+// dy = -10;
+// move 1 step up
+// advanceSnake();
+// draw snake on the canvas
+// drawSnake();
+
+main();
+
+function main() {
+  setTimeout(function onTick() {
+    clearCanvas();
+    advanceSnake();
+    drawSnake();
+    // call 'main' function over and over again
+    main();
+  }, 100);
+}
+
+document.addEventListener('keydown', changeDirection)
 
 function advanceSnake() {
   const head = { 
@@ -62,7 +76,38 @@ function drawSnakePart(snakePart) {
   ctx.strokeRect(snakePart.x, snakePart.y, 10, 10);
 }
 
+function changeDirection(event) {
+  const LEFT_KEY = 37; const RIGHT_KEY  = 39;
+  const UP_KEY = 38; const DOWN_KEY = 40;
+  const keyPressed = event.keyCode; const goingUp = dy === -10;
+  const goingDown = dy === 10; const goingRight = dx === 10;
+  const goingLeft = dx === -10;
+  if (keyPressed === LEFT_KEY && !goingRight) {
+    dx = -10;
+    dy = 0;
+  }
+  if (keyPressed === RIGHT_KEY && !goingLeft) {
+    dx = 10;
+    dy = 0;
+  }
+  if (keyPressed === UP_KEY && !goingDown) {
+    dx = 0;
+    dy = -10;
+  }
+  if (keyPressed === DOWN_KEY && !goingUp) {
+    dx = 0;
+    dy = 10;
+  }
+}
+
 function drawSnake() {
   snake.forEach(drawSnakePart);
 }
 
+// clear canvas function
+function clearCanvas() {
+  ctx.fillStyle = CANVAS_BACKGROUND;
+  ctx.strokeStyle = CANVAS_BORDER;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.strokeRect(0, 0, canvas.width, canvas.height);
+}
