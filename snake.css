@@ -1,0 +1,9 @@
+html {
+  display: flex;
+  justify-content: center;
+}
+
+/* #gameCanvas {
+  height: 300px;
+  width: 300px;
+} */
