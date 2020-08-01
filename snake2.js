@@ -6,7 +6,7 @@ const SNAKE_BORDER = 'darkgreen';
 const FOOD_COLOR = 'darkred';
 const FOOD_BORDER = 'lightred';
 
-snake = [
+let snake = [
   { x: 150, y: 150 },
   { x: 140, y: 150 },
   { x: 130, y: 150 },
@@ -29,9 +29,13 @@ const ctx = gameCanvas.getContext('2d');
 // start game 
 main();
 createFood();
+document.addEventListener('keydown', changeDirection);
 
 function main() {
+  if (didGameEnd()) return;
+
   setTimeout(function onTick() {
+    changingDirection = false;
     clearCanvas();
     drawFood();
     advanceSnake();
@@ -58,7 +62,6 @@ function advanceSnake() {
   // create the snake's head
   const head = {x: snake[0].x + dx, y: snake[0].y + dy};
   snake.unshift(head);
-  snake.pop();
   const didEatFood = snake[0].x === foodX && snake[0].y === foodY;
   if (didEatFood) {
     score += 10;
@@ -111,6 +114,9 @@ function changeDirection(event) {
   const RIGHT_KEY = 39;
   const UP_KEY = 38;
   const DOWN_KEY = 40;
+
+  if (changingDirection) return;
+  changeDirection = true;
 
   const keyPressed = event.keyCode;
   
